@@ -1,2 +1,6 @@
 /vendor
+/composer.json
+/composer.lock
+/output/feeds.txt
+/data/feeds.txt
 /.idea

@@ -16,7 +16,7 @@ if (!empty($_POST)) {
         $feedWriter = new FeedWriter(PARSED_FEED_FULLPATH);
 
         foreach ($RSSFeedList as $url) {
-            $filteredUrl =  trim(strip_tags($url));
+            $filteredUrl = trim(strip_tags($url));
             if (filter_var($filteredUrl, FILTER_VALIDATE_URL) === false) {
                 continue;
             }
@@ -36,8 +36,8 @@ if (!empty($_POST)) {
                 //We get the fields from our feed we need to write to disk
                 $itemData = array(
                     $item->get_title(),
-                    $item->get_date(),
                     $item->get_link(),
+                    $item->get_date('Y-m-d H:i:s'),
                 );
 
                 //We write the fields to disk
@@ -46,7 +46,6 @@ if (!empty($_POST)) {
                         array_map('html_entity_decode', $itemData)));
                 }
             }
-
         }
 
         if ($parsing_has_occurred === true) {
@@ -57,7 +56,7 @@ if (!empty($_POST)) {
             header("Expires: 0");
             header("Content-Disposition: attachment; filename=feeds.txt");
             echo file_get_contents(PARSED_FEED_FULLPATH);
-        }else{
+        } else {
             display_page();
         }
     }
@@ -70,7 +69,8 @@ if (!empty($_POST)) {
 session_destroy();
 
 
-function display_page(){
+function display_page()
+{
     ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -98,5 +98,5 @@ function display_page(){
         </form>
     </div>
 </div>
-<?php
+    <?php
 }

@@ -1,10 +1,10 @@
 <?php
 
 //Defining constants
-define( "RSS_FEED_FILE", 'data/feeds.txt' );
-define( "PARSED_FEED_FULLPATH", 'output/feeds.txt' );
-define( "PARSED_RSS_FIELD_DELIMITER", '|' );
-define( "PARSED_RSS_LINEBREAK", chr( 13 ) . chr( 10 ) );
+define("RSS_FEED_FILE", 'data/feeds.txt');
+define("PARSED_FEED_FULLPATH", 'output/feeds.txt');
+define("PARSED_RSS_FIELD_DELIMITER", '|');
+define("PARSED_RSS_LINEBREAK", chr(13) . chr(10));
 
 /**
  * Class FileReader
@@ -17,9 +17,9 @@ class FileReader
 
     private $file;
 
-    public function __construct( $filename )
+    public function __construct($filename)
     {
-        if ( ! is_file( $filename )) {
+        if (!is_file($filename)) {
             echo "<h4>The file could not be opened</h4>";
             exit;
         }
@@ -28,14 +28,14 @@ class FileReader
 
     public function readFile()
     {
-        $handle   = fopen( $this->file, 'r' );
+        $handle = fopen($this->file, 'r');
         $fileList = array();
-        while (( $data = trim( fgets( $handle ) ) ) != false) {
-            if (filter_var( $data, FILTER_VALIDATE_URL ) !== false) {
+        while (($data = trim(fgets($handle))) != false) {
+            if (filter_var($data, FILTER_VALIDATE_URL) !== false) {
                 $fileList[] = $data;
             }
         }
-        fclose( $handle );
+        fclose($handle);
 
         return $fileList;
     }
@@ -51,15 +51,15 @@ class Feed
     private $url;
     private $feed;
 
-    public function __construct( $url )
+    public function __construct($url)
     {
-        $this->url  = $url;
+        $this->url = $url;
         $this->feed = new SimplePie();
-        $this->feed->set_feed_url( $url );
-        $this->feed->enable_cache( false );
+        $this->feed->set_feed_url($url);
+        $this->feed->enable_cache(false);
         $this->feed->init();
         $error = $this->feed->error();
-        if ( ! empty( $error )) {
+        if (!empty($error)) {
             echo "<h3>Feed error: " . $error . "</h3>";
         }
     }
@@ -84,12 +84,12 @@ class FeedReader
      */
     private $feedData;
 
-    public function init( $url )
+    public function init($url)
     {
-        if ( ! is_null( $this->feedData )) {
-            unset( $this->feedData );
+        if (!is_null($this->feedData)) {
+            unset($this->feedData);
         }
-        $this->feedData = new Feed( $url );
+        $this->feedData = new Feed($url);
     }
 
     public function getData()
@@ -114,22 +114,23 @@ class FeedWriter
     private $parsedFilename;
     private $fileHandle;
 
-    public function __construct( $parsedFileName )
+    public function __construct($parsedFileName)
     {
         $this->parsedFilename = $parsedFileName;
-        $this->fileHandle     = fopen( $parsedFileName, "w" );
+        $this->fileHandle = fopen($parsedFileName, "w");
     }
 
     public function __destruct()
     {
-        fclose( $this->fileHandle );
+        fclose($this->fileHandle);
     }
 
-    public function writeFeed( $data )
+    public function writeFeed($data)
     {
-        if ( ! empty( $data )) {
-            fwrite( $this->fileHandle, $data . PARSED_RSS_LINEBREAK );
+        if (!empty($data)) {
+            fwrite($this->fileHandle, $data . PARSED_RSS_LINEBREAK);
         }
     }
+
 
 }
