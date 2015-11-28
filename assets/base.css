@@ -820,9 +820,7 @@ hr {
     clear: both; }
 
 form  {
-    display: block;
-    margin: 0 auto;
-    clear: both;
+    padding: 20px;
 }
 
 form textarea {
@@ -832,6 +830,10 @@ form textarea {
 #mainForm {
     position: relative;
     width: 75%;
+}
+
+h3 {
+    padding:0 20px;
 }
 
 

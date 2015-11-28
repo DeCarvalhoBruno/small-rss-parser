@@ -5,6 +5,7 @@ define("RSS_FEED_FILE", 'data/feeds.txt');
 define("PARSED_FEED_FULLPATH", 'output/feeds.txt');
 define("PARSED_RSS_FIELD_DELIMITER", '|');
 define("PARSED_RSS_LINEBREAK", chr(13) . chr(10));
+define("FEED_DATE_FORMAT", 'Y-m-d H:i:s');
 
 /**
  * Class FileReader
@@ -82,24 +83,68 @@ class FeedReader
     /**
      * @var Feed
      */
-    private $feedData;
+    private $feed;
+    /**
+     * @var SimplePie
+     */
+    private $data;
 
     public function init($url)
     {
-        if (!is_null($this->feedData)) {
-            unset($this->feedData);
+        if (!is_null($this->feed)) {
+            unset($this->feed);
         }
-        $this->feedData = new Feed($url);
+        $this->feed = new Feed($url);
+    }
+
+    public function getFeedData()
+    {
+        $this->data = $this->feed->getFeed();
+        return $this->data;
     }
 
     public function getData()
     {
-        return $this->feedData->getFeed();
+        return $this->data;
+    }
+
+    public function getItems($url)
+    {
+        $this->init($url);
+        $this->getFeedData();
+        return $this->data->get_items();
+    }
+
+    public function getItemQuantity()
+    {
+        return $this->data->get_item_quantity();
     }
 
     public function __destruct()
     {
-        unset($this->feedData);
+        unset($this->feed);
+    }
+
+    /**
+     * Reads fields in a Feed through Simple Pie,
+     * refer to the Simple Pie API for which fields can be retrieved.
+     *
+     * @param $item SimplePie_Item
+     * @return array
+     */
+    public static function readFeedItem($item)
+    {
+        return array(
+            $item->get_title(),
+            $item->get_link(),
+            $item->get_date(FEED_DATE_FORMAT),
+        );
+    }
+
+    public static function stringifyFeedItemFields(Array $fields)
+    {
+        return implode(PARSED_RSS_FIELD_DELIMITER,
+            array_map('html_entity_decode', $fields));
     }
 }
 

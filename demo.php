@@ -23,9 +23,7 @@ if (!empty($_POST)) {
 
             $parsing_has_occurred = true;
 
-            $feedReader->init($filteredUrl);
-            $data = $feedReader->getData();
-            $items = $data->get_items();
+            $items = $feedReader->getItems($filteredUrl);
 
             /**
              * Going through each RSS feed item
@@ -34,16 +32,11 @@ if (!empty($_POST)) {
              */
             foreach ($items as $item) {
                 //We get the fields from our feed we need to write to disk
-                $itemData = array(
-                    $item->get_title(),
-                    $item->get_link(),
-                    $item->get_date('Y-m-d H:i:s'),
-                );
+                $itemData = FeedReader::readFeedItem($item);
 
                 //We write the fields to disk
                 if (!empty($itemData)) {
-                    $feedWriter->writeFeed(implode(PARSED_RSS_FIELD_DELIMITER,
-                        array_map('html_entity_decode', $itemData)));
+                    $feedWriter->writeFeed(FeedReader::stringifyFeedItemFields($itemData));
                 }
             }
         }
@@ -79,15 +72,14 @@ function display_page()
         <link rel="stylesheet" type="text/css" href="/assets/base.css"/>
     </head>
 <body>
-<div id="header">
+<div>
     <h3>RSS Feed file parser</h3>
 
     <div id="mainForm">
         <form enctype="multipart/form-data"
               action="<?php
               echo $_SERVER["PHP_SELF"];
-              ?>" method="POST"
-              style="padding: 10px 10px 20px 10px">
+              ?>" method="POST">
             <div class="row">
                     <textarea class="form-control" rows="30" cols="50" id="feed_url" name="feed_url"
                               placeholder="<Enter feed urls here, one url per line>"></textarea>
