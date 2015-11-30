@@ -20,7 +20,7 @@ $feedWriter = new FeedWriter(PARSED_FEED_FULLPATH);
 
 
 //We go through the list of feeds to parse
-foreach ($RSSFeedList as $url) {
+foreach ($RSSFeedList as $key => $url) {
     $items = $feedReader->getItems($url);
 
     /**
@@ -34,6 +34,9 @@ foreach ($RSSFeedList as $url) {
 
         //We write the fields to disk
         if (!empty($itemData)) {
+            if ($fileReader->hasExtraParam($key)) {
+                $itemData[] = $fileReader->getExtraParam($key);
+            }
             $feedWriter->writeFeed(FeedReader::stringifyFeedItemFields($itemData));
         }
     }

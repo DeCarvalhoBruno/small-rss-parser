@@ -17,6 +17,14 @@ class FileReader
 {
 
     private $file;
+    /**
+     * After each feed url, the user can add a comma and a string that will be tacked on the end of each feed item
+     * in parsed results.
+     *
+     * @var array
+     */
+    private $extraParam;
+    private $hasExtraParam;
 
     public function __construct($filename)
     {
@@ -32,13 +40,43 @@ class FileReader
         $handle = fopen($this->file, 'r');
         $fileList = array();
         while (($data = trim(fgets($handle))) != false) {
-            if (filter_var($data, FILTER_VALIDATE_URL) !== false) {
-                $fileList[] = $data;
+            $dataParams = explode(',', $data);
+
+            if (filter_var($dataParams[0], FILTER_VALIDATE_URL) !== false) {
+                $fileList[] = $dataParams[0];
+            }
+
+            if (isset($dataParams[1])) {
+                $this->hasExtraParam[] = true;
+                $this->extraParam[] = $dataParams[1];
+            } else {
+                $this->hasExtraParam[] = false;
+                $this->extraParam[] = null;
             }
         }
         fclose($handle);
 
         return $fileList;
+    }
+
+    /**
+     *
+     * @see FileReader::$extraParam
+     * @param integer $index
+     * @return boolean
+     */
+    public function hasExtraParam($index)
+    {
+        return $this->hasExtraParam[$index];
+    }
+
+    /**
+     * @param integer $index
+     * @return string|null
+     */
+    public function getExtraParam($index)
+    {
+        return $this->extraParam[$index];
     }
 }
 

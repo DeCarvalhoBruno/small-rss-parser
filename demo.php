@@ -6,6 +6,7 @@ require_once __DIR__ . '/core/class.php';
 session_start();
 
 if (!empty($_POST)) {
+    $hasExtraParam = $extraParam = array();
     $parsing_has_occurred = false;
     if (isset($_POST["feed_url"])) {
         $RSSFeedList = array_filter(explode(chr(13), $_POST["feed_url"]));
@@ -15,10 +16,22 @@ if (!empty($_POST)) {
         $feedReader = new FeedReader();
         $feedWriter = new FeedWriter(PARSED_FEED_FULLPATH);
 
-        foreach ($RSSFeedList as $url) {
-            $filteredUrl = trim(strip_tags($url));
+        foreach ($RSSFeedList as $key => $url) {
+            //Getting the feed url with possible extra parameter
+            $dataParams = explode(',', $url);
+
+            $filteredUrl = trim(strip_tags($dataParams[0]));
             if (filter_var($filteredUrl, FILTER_VALIDATE_URL) === false) {
                 continue;
+            }
+
+            //if a feed has an extra parameter
+            if (isset($dataParams[1])) {
+                $hasExtraParam[] = true;
+                $extraParam[] = $dataParams[1];
+            } else {
+                $hasExtraParam[] = false;
+                $extraParam[] = null;
             }
 
             $parsing_has_occurred = true;
@@ -36,6 +49,10 @@ if (!empty($_POST)) {
 
                 //We write the fields to disk
                 if (!empty($itemData)) {
+                    //We take the extra parameter tacked on to the end of the feed url and add it to the parsed result.
+                    if ($hasExtraParam[$key] === true) {
+                        $itemData[] = $extraParam[$key];
+                    }
                     $feedWriter->writeFeed(FeedReader::stringifyFeedItemFields($itemData));
                 }
             }
